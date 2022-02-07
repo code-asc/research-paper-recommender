@@ -35,6 +35,6 @@ def acm_meta(doi):
 		except Exception as e:
 			None
 
-	data['citations'] = all_citations
+	data['cited_by'] = all_citations
 
 	return json.dumps(data, indent=2)
