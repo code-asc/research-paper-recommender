@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 def acm_meta(doi):
 	data = {}
 	page = requests.get('https://dl.acm.org/doi/' + doi).text
-	parser = BeautifulSoup(page)
+	parser = BeautifulSoup(page, features='html.parser')
 	refs_ = parser.find('ol', {'class': 'references__list'})
 
 	refs = {} # all the references in the paper
@@ -27,7 +27,7 @@ def acm_meta(doi):
 
 	# Code for citations
 	cited_by = requests.get('https://dl.acm.org/action/ajaxShowCitedBy?doi=' + doi).text
-	c_parser = BeautifulSoup(cited_by)
+	c_parser = BeautifulSoup(cited_by, features='html.parser')
 	all_citations = {}
 	for each_cite in c_parser.findAll('li', {'class': 'references__item'}):
 		try:
