@@ -22,8 +22,10 @@ class Ranking:
 	d) in_link
 
 	For better understanding, please refer the following paper
+	http://www.datalab.uci.edu/papers/white_smyth.pdf
 
-	Algorithms for estimating relative importance in networks
+	Also the reference from towardsdatascience.com
+	https://towardsdatascience.com/pagerank-3c568a7d2332
 	
 	"""
 	def __init__(self, file_, beta=0.5, prior_bias_node=[], iterations=100):
@@ -92,6 +94,6 @@ class Ranking:
 			total_score = sum([scores[key] for key in scores.keys()])
 
 			for key in scores.keys():
-				scores[key] /= total_score
+				scores[key] /= float(total_score)
 
 		return scores

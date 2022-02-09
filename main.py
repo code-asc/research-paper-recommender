@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from utils.utils import get_citation_doi
+from utils.utils import get_paper_citation_pairs
 from acm_api.acm import acm_meta
 
 
@@ -50,7 +51,7 @@ if __name__ == '__main__':
 	con.close()
 
 	########################################
-	# Code for creating the rating matrix
+	# code for creating the rating matrix
 	citation_set = set()
 
 	for key in data.keys():
@@ -66,4 +67,9 @@ if __name__ == '__main__':
 				df.loc[i][j] = 1
 
 	df.to_csv('citation-web/matrix-way/citation-matrix.csv')
+	########################################
+
+	########################################
+	# creating the citation pairs
+	citation_pair_path = get_paper_citation_pairs(df, 'citation-pairs.txt')
 	########################################

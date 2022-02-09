@@ -21,7 +21,7 @@ class Ranking:
 	c) out_link
 	d) in_link
 	"""
-	def __init__(self, file_, damping=0.85, iterations=100):
+	def __init__(self, file_, damping=0.15, iterations=100):
 		self.file_name = file_
 		self.data = self.create()
 		self.d = damping
