@@ -29,7 +29,7 @@ class CFU:
 
 	def __normalize__(self):
 		print('normalizing dataframe....')
-		for index in tqdm(self.index_col):
+		for index in tqdm(self.df.index.values):
 			self.df.loc[index] = self.df.loc[index].div(np.linalg.norm(self.df.loc[index]))
 
 	def __similarity__(self):
