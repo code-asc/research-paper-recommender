@@ -61,17 +61,13 @@ class CFU:
 		"""
 		data = similarity_matrix.copy()
 		cols = data.columns
-		norm = {}
-
+		
 		print('normalizing the similarity matrix....')
 		for col in tqdm(cols):
 			data.loc[col][col] = 0
-			data[col] = (data[col] - data[col].min())/(data[col].max() - data[col].min())
+			data[col] = data[col].div(data[col].sum())
 
 		return data
-
-
-
 
 
 	def __top__(self, item, n=20):
