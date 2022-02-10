@@ -20,7 +20,7 @@ class CFU:
 		self.df.drop([self.index_col], axis=1, inplace=True)
 
 		self.__normalize__()
-		
+
 		self.similarity_mat = self.__similarity__()
 		self.column_names = self.df.columns
 
@@ -55,6 +55,9 @@ class CFU:
 
 		Reference below
 		http://glaros.dtc.umn.edu/gkhome/node/124
+
+		https://math.stackexchange.com/questions/278418/normalize-values-to-sum-1-but-keeping-their-weights
+		
 		"""
 		data = similarity_matrix.copy()
 		cols = data.columns
