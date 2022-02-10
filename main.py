@@ -5,6 +5,7 @@ from tqdm import tqdm
 from utils.utils import get_citation_doi
 from utils.utils import get_paper_citation_pairs
 from acm_api.acm import acm_meta
+from ranking.
 
 
 
@@ -72,4 +73,20 @@ if __name__ == '__main__':
 	########################################
 	# creating the citation pairs
 	citation_pair_path = get_paper_citation_pairs(df, 'citation-pairs.txt')
+	########################################
+
+
+	########################################
+	# Experiment 1
+	# Plain CF
+	
+	# TO DO
+	########################################
+
+
+	########################################
+	# Experiment 1
+	# Plain CF
+	
+	# TO DO
 	########################################

@@ -1,16 +1,17 @@
 from tqdm import tqdm
 import pandas as pd
 import numpy as np
+import math
 
 
-class NCF:
+class CFU:
 	"""
 	The file_ is the path for the input csv file.
 	The data should be of following format
 	1) First column represent the user or paper
 	2) Second column represent the attributes or the citations
 	"""
-	def __init__(self, default_path='../citation-web/matrix-way/', file_):
+	def __init__(self, default_path='citation-web/matrix-way/', file_='citation-matrix.csv', normalize_similarity=False):
 		self.file_ = file_
 		self.df = pd.read_csv(default_path + file_)
 
@@ -18,11 +19,16 @@ class NCF:
 		self.df.set_index(self.df[self.index_col], inplace=True)
 		self.df.drop([self.index_col], axis=1, inplace=True)
 
+		self.__normalize__()
+		
 		self.similarity_mat = self.__similarity__()
 		self.column_names = self.df.columns
 
+		if normalize_similarity:
+			self.similarity_mat = self.__normalize_col__(self.similarity_mat)
+
 	def __normalize__(self):
-		print('Normalizing dataframe....')
+		print('normalizing dataframe....')
 		for index in tqdm(self.index_col):
 			self.df.loc[index] = self.df.loc[index].div(np.linalg.norm(self.df.loc[index]))
 
@@ -34,11 +40,34 @@ class NCF:
 		cols = self.df.columns
 		num_of_cols = len(cols)
 		similarity_mat = pd.DataFrame(np.zeros((num_of_cols, num_of_cols)), columns=cols, index=cols)
-		print('Creating similarity matrix....')
+		print('creating similarity matrix....')
 		for col_i in tqdm(cols):
 			for col_j in cols:
 				similarity_mat.loc[col_i][col_j] = np.dot(self.df[col_i], self.df[col_j])/(np.linalg.norm(self.df[col_i]) * np.linalg.norm(self.df[col_j]))
 		return similarity_mat
+
+
+	def __normalize_col__(self, similarity_matrix):
+		"""
+		This method is used to normalize the similarity matrix.
+		It is column-wise normalization, meaning the items are normalized
+		to reduce the impact of moderate item overlap
+
+		Reference below
+		http://glaros.dtc.umn.edu/gkhome/node/124
+		"""
+		data = similarity_matrix.copy()
+		cols = data.columns
+		norm = {}
+
+		print('normalizing the similarity matrix....')
+		for col in tqdm(cols):
+			data.loc[col][col] = 0
+			data[col] = (data[col] - data[col].min())/(data[col].max() - data[col].min())
+
+		return data
+
+
 
 
 
@@ -69,15 +98,15 @@ class NCF:
 		unknowns = unknowns - already_known
 		suggestions = pd.DataFrame(np.zeros((len(unknowns))), index = unknowns, columns=['score'])
 
-		print('Computing recommendations for : ' + index)
+		print('computing recommendations for : ' + index)
 		for unknown in tqdm(unknowns):
 			temp = 0
 			for known in already_known:
 				temp += self.similarity_mat.loc[unknown][known]
 			suggestions.loc[unknown] = temp
 
-		 suggestions = suggestions.sort_values(by=['score'], ascending=False)
-		 return suggestions.index.values[:n], suggestions['score'][:n].values
+		suggestions = suggestions.sort_values(by=['score'], ascending=False)
+		return suggestions.index.values[:n], suggestions['score'][:n].values
 
 
 

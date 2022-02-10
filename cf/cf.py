@@ -10,7 +10,7 @@ class CF:
 	1) First column represent the user or paper
 	2) Second column represent the attributes or the citations
 	"""
-	def __init__(self, default_path='../citation-web/matrix-way/', file_):
+	def __init__(self, default_path='citation-web/matrix-way/', file_='citation-matrix.csv'):
 		self.file_ = file_
 		self.df = pd.read_csv(default_path + file_)
 
