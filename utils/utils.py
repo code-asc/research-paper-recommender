@@ -3,14 +3,14 @@ from tqdm.notebook import tqdm
 import json
 
 
-def get_paper_citation_pairs(df, out_file='citation-pairs.txt'):
+def get_paper_citation_pairs(df, dir='citation-web/pair-way/', out_file='citation-pairs.txt'):
 	"""
 	This method is used to extract the citation pairs from the dataframe.
 	It return the path of the text file "citation_pairs.txt"
 	"""
 	indexs = df.index.values
 	columns = df.columns.values
-	path = 'citation-web/pair-way/' + out_file
+	path = dir + out_file
 	with open(path, 'a') as f:
 		print('writing citation pairs....')
 		for index in tqdm(indexs):

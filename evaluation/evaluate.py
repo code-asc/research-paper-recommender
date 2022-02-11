@@ -2,6 +2,7 @@ import random
 import numpy as np
 import pandas as pd
 from pprint import pprint
+from utils.utils import get_paper_citation_pairs
 
 
 class Train_Test_Split:
@@ -67,6 +68,27 @@ class Train_Test_Split:
 		# First create the temporary rating matrix and also the pair wise relation
 		None
 	
+	def __rating_matrix__(self, data_):
+		"""
+		This method is used to create rating matrix and also
+		pair wise relations
+		"""
+		data = data_.copy()
+		citation_set = set()
+		for key in data.keys():
+			citation_set.update(data[key])
+
+		index_ = data.keys()
+		df = pd.DataFrame(np.zeros((len(index_), len(citation_set))), index=index_, columns=citation_set)
+
+		for i in index_:
+			for j in citation_set:
+				if j in data[i]:
+					df.loc[i][j] = 1
+
+		df.to_csv('temp/matrix-way/temp-citation-matrix.csv')
+		get_paper_citation_pairs(df, dir='temp/matrix-way/', out_file='temp-citation-pairs.txt')
+
 	def __evaluate__(self, data_):
 		"""
 		This method evaluates the algorithm using the half-life formula	
@@ -90,4 +112,6 @@ class Train_Test_Split:
 		pprint(doi_less_than_limit)
 
 		train_set, test_set = self.__split__(dois)
-		held_out, no_held_out_data = self.__pickout__(doi_dict, test_set)
+		held_out, renewed_data = self.__pickout__(doi_dict, test_set)
+
+		self.__rating_matrix__(renewed_data)
