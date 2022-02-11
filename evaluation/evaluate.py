@@ -37,12 +37,14 @@ class Train_Test_Split_Plain:
 	Find more details from the paper
 	https://dl.acm.org/doi/10.1145/1864708.1864740
 	"""
-	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, min_held_out_ref=5, reuse=False):
+	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, min_held_out_ref=5, r_max=3.6425, reuse=False):
 		self.recommender = recommender
 		self.train_size = train_size
 		self.min_ref_limit = min_ref_limit
 		self.random_state = random_state
 		self.min_held_out_ref = min_held_out_ref
+		self.reuse = reuse
+		self.r_max = r_max
 
 	def __split__(self, dois):
 		"""
@@ -71,13 +73,26 @@ class Train_Test_Split_Plain:
 		
 		return held_out, data
 
-	def __recommendations__(self):
+	def __recommendations__(self, test_set):
 		"""
 		This method is used to give recommendations based
 		on inputted algorithm. The algorithm depends on the
 		input variable recommender in the constructor
+
+		Parameters:
+		test_set : test_set is required to produce the recommendations and 
+				   use them for evaluation later in __evaluate__ method
 		"""
-		
+		recommendations = {}
+		obj = self.recommender(default_path='temp/matrix-way/', file_='temp-citation-matrix.csv')
+
+		for test in test_set:
+			suggestions, _ = obj.recommend(test)
+
+			recommendations[test] = suggestions
+
+		return recommendations
+
 	
 	def __rating_matrix__(self, data_):
 		"""
@@ -98,14 +113,31 @@ class Train_Test_Split_Plain:
 					df.loc[i][j] = 1
 
 		df.to_csv('temp/matrix-way/temp-citation-matrix.csv')
-		get_paper_citation_pairs(df, dir='temp/matrix-way/', out_file='temp-citation-pairs.txt')
+		get_paper_citation_pairs(df, dir='temp/pair-way/', out_file='temp-citation-pairs.txt')
 
-	def __evaluate__(self, data_):
+	def __evaluate__(self, dois_, suggestions_):
 		"""
 		This method evaluates the algorithm using the half-life formula	
 		descibed in the paper
+
+		Find more details from the paper
+		https://dl.acm.org/doi/10.1145/1864708.1864740
 		"""
-		None
+		suggestions = suggestions_.copy()
+		dois = dois_.copy()
+		whole_sum = 0
+
+		print('finishing evaluation....')
+		for key in tqdm(suggestions.keys()):
+			each_sum = 0
+			for i in range(len(suggestions[key])):
+				if suggestions[key][i] in dois_[key]:
+					each_sum += 1.0/( 2 ** ((i) / (self.min_held_out_ref - 1)))
+
+			whole_sum += each_sum
+
+		return whole_sum/(len(suggestions.keys()) * self.r_max)
+
 
 	def fit(self, doi_dict_):
 		doi_dict = doi_dict_.copy()
@@ -125,5 +157,12 @@ class Train_Test_Split_Plain:
 		train_set, test_set = self.__split__(dois)
 		held_out, renewed_data = self.__pickout__(doi_dict, test_set)
 
-		self.__rating_matrix__(renewed_data)
-		self.__recommendations__()
+		if not self.reuse:
+			self.__rating_matrix__(renewed_data)
+		else:
+			if not (os.path.isfile('temp/matrix-way/temp-citation-matrix.csv') and 
+					os.path.isfile('temp/pair-way/temp-citation-pairs.txt')):
+				self.__rating_matrix__(renewed_data)
+
+		suggestions = self.__recommendations__(test_set)
+		return self.__evaluate__(doi_dict, suggestions)
