@@ -1,4 +1,5 @@
-from tqdm import tqdm
+# from tqdm import tqdm
+import tqdm.notebook as tq
 import pandas as pd
 import numpy as np
 
@@ -45,7 +46,7 @@ class CF:
 		return self.similarity_mat.loc[item].sort_values(ascending=False)[:n].iloc[1:]
 
 
-	def recommendations(self, index, n=10, k=20):
+	def recommend(self, index, n=10, k=20):
 		"""
 		The following is way the algorithm works
 		1) For each item, the k most similar items are computed using __top__ method to get {j1, j2, j3, j4 ....}
