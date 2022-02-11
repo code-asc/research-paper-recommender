@@ -25,6 +25,9 @@ def get_citation_doi(references):
 	This method is used to extract the doi's
 	from the reference list
 
+	We are looking to get the citations that
+	exisit in acm dl
+
 	Note: Some papers may not have doi. In such 
 	scenario, we completely ignore the reference
 	"""
