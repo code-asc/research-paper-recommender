@@ -1,3 +1,4 @@
+import os
 import random
 import numpy as np
 import pandas as pd
@@ -5,7 +6,7 @@ from pprint import pprint
 from utils.utils import get_paper_citation_pairs
 
 
-class Train_Test_Split:
+class Train_Test_Split_Plain:
 	"""
 	This class is used to input all the dois and split the
 	data into two sets i.e., train and test set. The train
@@ -22,10 +23,21 @@ class Train_Test_Split:
 
 	3) We evaluate the algorithm using the half-life α of 5
 
+	Parameters:
+	recommender : Any recommender that follows the standards of abstract class defined
+	train_size : Size of the training set
+	min_ref_limit : Minimum # of references required in each paper. If less than 
+					threshold, then ignore them
+	random_state : Similar to seed
+	min_held_out_ref : # of references that need to be kept aside in each of the test 
+						paper for evaluation
+	reuse : If the matrix and pair-wise file already exists, then simply use them 
+			instead of creating new files again. To activate, set it to true
+
 	Find more details from the paper
 	https://dl.acm.org/doi/10.1145/1864708.1864740
 	"""
-	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, min_held_out_ref=5):
+	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, min_held_out_ref=5, reuse=False):
 		self.recommender = recommender
 		self.train_size = train_size
 		self.min_ref_limit = min_ref_limit
@@ -59,14 +71,13 @@ class Train_Test_Split:
 		
 		return held_out, data
 
-	def __get_recommendations__(self, data_):
+	def __recommendations__(self):
 		"""
 		This method is used to give recommendations based
-		on inputted algorithm
+		on inputted algorithm. The algorithm depends on the
+		input variable recommender in the constructor
 		"""
-		#### TODO: Implement the algorithm here ####
-		# First create the temporary rating matrix and also the pair wise relation
-		None
+		
 	
 	def __rating_matrix__(self, data_):
 		"""
@@ -115,3 +126,4 @@ class Train_Test_Split:
 		held_out, renewed_data = self.__pickout__(doi_dict, test_set)
 
 		self.__rating_matrix__(renewed_data)
+		self.__recommendations__()
