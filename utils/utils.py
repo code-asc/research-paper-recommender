@@ -1,5 +1,5 @@
 # from tqdm import tqdm
-import tqdm.notebook as tq
+from tqdm.notebook import tqdm
 import json
 
 

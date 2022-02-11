@@ -4,7 +4,7 @@ import pandas as pd
 from pprint import pprint
 
 
-class Train_test_split:
+class Train_Test_Split:
 	"""
 	This class is used to input all the dois and split the
 	data into two sets i.e., train and test set. The train
@@ -24,10 +24,12 @@ class Train_test_split:
 	Find more details from the paper
 	https://dl.acm.org/doi/10.1145/1864708.1864740
 	"""
-	def __init__(self, train_size=0.5, min_ref_limit= 15, random_state=31):
+	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, min_held_out_ref=5):
+		self.recommender = recommender
 		self.train_size = train_size
 		self.min_ref_limit = min_ref_limit
-		self.random_state = 31
+		self.random_state = random_state
+		self.min_held_out_ref = min_held_out_ref
 
 	def __split__(self, dois):
 		"""
@@ -43,11 +45,37 @@ class Train_test_split:
 
 		return (train_set, test_set)
 
-	def __pickout__(self, data, test_set):
-		for 
+	def __pickout__(self, data_, test_set):
+		"""
+		This method picks out the references from the test data
+		paper and returns the hold out test references
+		"""
+		data = data_.copy()
+		held_out = {}
+		for test in test_set:
+			held_out[test] = random.sample(data[test], self.min_held_out_ref)
+			data[test] = [x for x in data[test] if x not in held_out[test]]
+		
+		return held_out, data
 
-	def fit(self, doi_dict):
-		doi_dict = doi_dict.copy()
+	def __get_recommendations__(self, data_):
+		"""
+		This method is used to give recommendations based
+		on inputted algorithm
+		"""
+		#### TODO: Implement the algorithm here ####
+		# First create the temporary rating matrix and also the pair wise relation
+		None
+	
+	def __evaluate__(self, data_):
+		"""
+		This method evaluates the algorithm using the half-life formula	
+		descibed in the paper
+		"""
+		None
+
+	def fit(self, doi_dict_):
+		doi_dict = doi_dict_.copy()
 		doi_less_than_limit = {}
 		dois = []
 
@@ -61,3 +89,5 @@ class Train_test_split:
 		print("The following doi's are ignored because of low reference :")
 		pprint(doi_less_than_limit)
 
+		train_set, test_set = self.__split__(dois)
+		held_out, no_held_out_data = self.__pickout__(doi_dict, test_set)
