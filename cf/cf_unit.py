@@ -1,5 +1,5 @@
-# from tqdm import tqdm
-import tqdm.notebook as tq
+from tqdm import tqdm
+# import tqdm.notebook as tq
 import pandas as pd
 import numpy as np
 import math
@@ -12,21 +12,39 @@ class CFU:
 	1) First column represent the user or paper
 	2) Second column represent the attributes or the citations
 	"""
-	def __init__(self, default_path='citation-web/matrix-way/', file_='citation-matrix.csv', normalize_similarity=False):
+	def __init__(self, default_path='citation-web/matrix-way/', file_='citation-matrix.csv', 
+					normalize_similarity=False):
+	
 		self.file_ = file_
 		self.df = pd.read_csv(default_path + file_)
 
 		self.index_col = self.df.columns[0]
 		self.df.set_index(self.df[self.index_col], inplace=True)
+		self.df.index = self.df.index.astype(str, copy = False)
 		self.df.drop([self.index_col], axis=1, inplace=True)
 
+		self.__clean__()
 		self.__normalize__()
+		
 
 		self.similarity_mat = self.__similarity__()
+		
 		self.column_names = self.df.columns
 
 		if normalize_similarity:
 			self.similarity_mat = self.__normalize_col__(self.similarity_mat)
+
+	def __clean__(self):
+		"""
+		This method is used to remove the index for which there are 
+		no items/citations
+		"""
+		indexes = self.df.index.values.copy()
+		print('removing the indexes with no citations....')
+		for index in indexes:
+			if not (1 in self.df.loc[index].values):
+				print('Deleting : ', index)
+				self.df.drop(index, inplace=True)
 
 	def __normalize__(self):
 		print('normalizing dataframe....')
