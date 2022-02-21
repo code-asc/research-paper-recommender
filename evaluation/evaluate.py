@@ -38,7 +38,9 @@ class Train_Test_Split_Plain:
 	Find more details from the paper
 	https://dl.acm.org/doi/10.1145/1864708.1864740
 	"""
-	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, min_held_out_ref=5, r_max=3.6425, reuse=False):
+	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, 
+					min_held_out_ref=5, r_max=3.6425, reuse=False, biased=False,
+					normalize_similarity=True):
 		self.recommender = recommender
 		self.train_size = train_size
 		self.min_ref_limit = min_ref_limit
@@ -46,6 +48,8 @@ class Train_Test_Split_Plain:
 		self.min_held_out_ref = min_held_out_ref
 		self.reuse = reuse
 		self.r_max = r_max
+		self.biased = biased
+		self.normalize_similarity = normalize_similarity
 
 	def __split__(self, dois):
 		"""
@@ -85,9 +89,15 @@ class Train_Test_Split_Plain:
 				   use them for evaluation later in __evaluate__ method
 		"""
 		recommendations = {}
-		if self.recommender.__name__ == 'CFUR':
+		if self.recommender.__name__ == 'CFUPR':
+			obj = self.recommender(default_path='temp/', file_='matrix-way/temp-citation-matrix.csv',
+									file_pair='pair-way/temp-citation-pairs.txt', biased=self.biased,
+									normalize_similarity=self.normalize_similarity)
+		
+		elif self.recommender.__name__ == 'CFUH':
 			obj = self.recommender(default_path='temp/', file_='matrix-way/temp-citation-matrix.csv',
 									file_pair='pair-way/temp-citation-pairs.txt')
+
 		else:
 			obj = self.recommender(default_path='temp/matrix-way/', file_='temp-citation-matrix.csv')
 

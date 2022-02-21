@@ -12,7 +12,7 @@ def get_paper_citation_pairs(df, dir_='citation-web/pair-way/', out_file='citati
 	indexs = df.index.values
 	columns = df.columns.values
 	path = dir_ + out_file
-	with open(path, 'a') as f:
+	with open(path, 'wt') as f:
 		print('writing citation pairs....')
 		for index in tqdm(indexs):
 			for column in columns:
