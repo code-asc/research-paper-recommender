@@ -24,7 +24,7 @@ def dummy_data(dummy_paper=200):
 	dummy_citations = set()
 	for paper in range(1, dummy_paper):
 		temp = {}
-		citations = random.sample(range(dummy_paper, dummy_paper+100), 70)
+		citations = random.sample(range(dummy_paper, dummy_paper+100), 50)
 
 		for citation in citations:
 			temp[str(citation)] = {"Google Scholar": str(citation), "Digital Library": "/doi/"+str(citation)}
@@ -36,3 +36,14 @@ def dummy_data(dummy_paper=200):
 
 	con.commit()
 	con.close()
+
+
+def dummy_doi(num_of_doi, default_path='doi/', default_file='doi.txt'):
+	"""
+	This method is used to generate fake doi and store the data in the
+	specified file
+	"""
+	with open(default_path+default_file, 'wt') as f:
+		for i in range(num_of_doi):
+			f.write(str(i) + '\n')
+

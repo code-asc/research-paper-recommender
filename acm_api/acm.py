@@ -1,5 +1,6 @@
 import json
 import requests
+import re
 from bs4 import BeautifulSoup
 
 
@@ -31,7 +32,10 @@ def acm_meta(doi):
 	all_citations = {}
 	for each_cite in c_parser.findAll('li', {'class': 'references__item'}):
 		try:
-			all_citations[each_cite.find('span', {'class':'references__article-title'}).text] = each_cite.p.a.get('href')
+			if re.search("^(https://doi.org/){1}.*", each_cite.p.a.get('href')):
+				all_citations[each_cite.find('span', {'class':'references__article-title'}).text] = {'Digital Library': each_cite.p.a.get('href').replace('https://doi.org/', '')}
+			else:
+				all_citations[each_cite.find('span', {'class':'references__article-title'}).text] = {'Others' : each_cite.p.a.get('href')}
 		except Exception as e:
 			None
 

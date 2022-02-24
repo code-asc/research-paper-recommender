@@ -27,7 +27,7 @@ def get_citation_doi(references):
 	from the reference list
 
 	We are looking to get the citations that
-	exisit in acm dl
+	exist in acm dl
 
 	Note: Some papers may not have doi. In such 
 	scenario, we completely ignore the reference
@@ -48,3 +48,27 @@ def get_citation_doi(references):
 			if temp:
 				doi.append(temp.replace('/doi/', '').strip())
 	return doi
+
+
+def get_cited_by_doi(references):
+	"""
+	This method is used to extract all the doi from 
+	the cited by list that exist in acm dl
+	"""
+	doi = []
+	if type(references).__name__ == 'str':
+		references = json.loads(references)
+	else:
+		if not type(references).__name__ == 'dict':
+			return []
+
+	all_cited_by = references.get('cited_by', None)
+
+	if all_cited_by:
+		print("extracting cited_by doi....")
+		for key in tqdm(all_cited_by.keys()):
+			temp = all_cited_by[key].get('Digital Library', None)
+			if temp:
+				doi.append(temp.replace('/doi/', '').strip())
+	return doi
+

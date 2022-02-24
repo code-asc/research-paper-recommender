@@ -30,16 +30,17 @@ class Ranking:
 		self.file_name = file_
 		self.default_temp_file_path  = default_temp_file_path
 		self.root_nodes = set(root_nodes)
-		self.potential_hub_nodes = set(self.__potential_hubs__()) -	self.root_nodes
+		self.potential_hub_auth_nodes = set(self.__potential_hub_and_auth__()) - self.root_nodes
 		self.__base__()
 
 		self.data = self.__create__()
 
-		self.auth_score = self.__assign_auth_score__()
+		self.auth_score = self.__assign_score__()
+		self.hub_score = self.__assign_score__()
 
 		self.iterations = iterations
 
-	def __assign_auth_score__(self):
+	def __assign_score__(self):
 		"""
 		This method is used to assign the authorative score to
 		all the nodes in the base network. Default we are assigning
@@ -69,7 +70,7 @@ class Ranking:
 
 		"""
 		required_nodes = set(self.root_nodes)
-		required_nodes.update(self.potential_hub_nodes)
+		required_nodes.update(self.potential_hub_auth_nodes)
 
 		base_network = []
 
@@ -85,20 +86,22 @@ class Ranking:
 				f.write(edge)
 
 		
-	def __potential_hubs__(self):
+	def __potential_hub_and_auth__(self):
 		"""
 		This method is used to find all the pages that link to the 
 		nodes/papers in the root nodes. These are called potential hubs
 		"""
-		potential_hub_nodes = []
+		potential_hub_and_auth_nodes = []
 		with open(self.file_name, 'r') as f:
 			for line in f:
 				from_, to_ = line.strip().replace('\n', '').split(',')
 
 				if to_ in self.root_nodes:
-					potential_hub_nodes.append(from_)
+					potential_hub_and_auth_nodes.append(from_)
+				elif from_ in self.root_nodes:
+					potential_hub_and_auth_nodes.append(to_)
 
-		return potential_hub_nodes 
+		return potential_hub_and_auth_nodes 
 
 
 
@@ -118,12 +121,10 @@ class Ranking:
 					temp.vertex = from_
 					node_dict[from_] = temp
 
-
 				if not node_dict.get(to_, False):
 					temp = Node()
 					temp.vertex = to_
 					node_dict[to_] = temp
-
 
 				from_node = node_dict[from_]
 				to_node = node_dict[to_]
@@ -135,21 +136,35 @@ class Ranking:
 
 	def __calculate__(self):
 		for _ in range(self.iterations):
-			temp = {}
-			total = 0.0
+			temp_auth = {}
+			temp_hub = {}
+			total_auth = 0.0
+			total_hub = 0.0
+
 			for key in self.data.keys():
-				temp_val = sum([self.auth_score[i] for i in self.data[key].in_link])
-				temp[key] = temp_val
-				total += temp_val
+				temp_val_auth = sum([self.hub_score[i] for i in self.data[key].in_link])
+				temp_val_hub = sum([self.auth_score[i] for i in self.data[key].out_link])
+
+				temp_auth[key] = temp_val_auth
+				temp_hub[key] = temp_val_hub
+
+				total_auth += temp_val_auth
+				total_hub += temp_val_hub
 
 			# Normalize the values 
 			for key in self.data.keys():
-				if total > 0:
-					temp[key] = temp[key]/total
+				if total_auth > 0:
+					temp_auth[key] = temp_auth[key]/total_auth
 				else: 
-					temp[key] = 0.0
+					temp_auth[key] = 0.0
 
-			self.auth_score = temp.copy()
+				if total_hub > 0:
+					temp_hub[key] = temp_hub[key]/total_hub
+				else:
+					temp_hub[key] = 0.0
+
+			self.auth_score = temp_auth.copy()
+			self.hub_score = temp_hub.copy()
 
 	def scores(self):
 		scores = {}
