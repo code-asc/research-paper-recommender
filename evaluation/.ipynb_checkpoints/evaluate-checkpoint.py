@@ -39,17 +39,17 @@ class Train_Test_Split_Plain:
 	https://dl.acm.org/doi/10.1145/1864708.1864740
 	"""
 	def __init__(self, recommender, train_size=0.5, min_ref_limit= 15, random_state=31, 
-					min_held_out_ref=5, r_max=3.6425, biased=False,
-					normalize_similarity=True, root_node_indexes=None):
+					min_held_out_ref=5, r_max=3.6425, reuse=False, biased=False,
+					normalize_similarity=True):
 		self.recommender = recommender
 		self.train_size = train_size
 		self.min_ref_limit = min_ref_limit
 		self.random_state = random_state
 		self.min_held_out_ref = min_held_out_ref
+		self.reuse = reuse
 		self.r_max = r_max
 		self.biased = biased
 		self.normalize_similarity = normalize_similarity
-		self.root_node_indexes = root_node_indexes
 
 	def __split__(self, dois):
 		"""
@@ -96,7 +96,7 @@ class Train_Test_Split_Plain:
 		
 		elif self.recommender.__name__ == 'CFUH':
 			obj = self.recommender(default_path='temp/', file_='matrix-way/temp-citation-matrix.csv',
-									file_pair='pair-way/temp-citation-pairs.txt', root_node_indexes=self.root_node_indexes)
+									file_pair='pair-way/temp-citation-pairs.txt')
 
 		else:
 			obj = self.recommender(default_path='temp/matrix-way/', file_='temp-citation-matrix.csv')
@@ -172,14 +172,13 @@ class Train_Test_Split_Plain:
 		train_set, test_set = self.__split__(dois)
 		held_out, renewed_data = self.__pickout__(doi_dict, test_set)
 
-		self.__rating_matrix__(renewed_data)
-		
+
+		if not self.reuse:
+			self.__rating_matrix__(renewed_data)
+		else:
+			if not (os.path.isfile('temp/matrix-way/temp-citation-matrix.csv') and 
+					os.path.isfile('temp/pair-way/temp-citation-pairs.txt')):
+				self.__rating_matrix__(renewed_data)
 
 		suggestions = self.__recommendations__(test_set)
 		return self.__evaluate__(doi_dict, suggestions)
-
-
-	def fit(self, doi_dict_original, doi_dict_):
-		#TODO
-		# Also handle 404 error
-		None

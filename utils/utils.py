@@ -1,4 +1,5 @@
-# from tqdm import tqdm
+from utils.dummy import get_dummy_info
+from acm_api.acm import acm_meta
 from tqdm.notebook import tqdm
 import requests
 import json
@@ -71,4 +72,53 @@ def get_cited_by_doi(references):
 			if temp:
 				doi.append(temp.replace('/doi/', '').strip())
 	return doi
+
+
+
+def get_fully_connected_network(overall, cited_by_doi, acm=True):
+	"""
+	This method is used to complete all the edges between 
+	base graph for HITS algorithm. 
+
+	Parameter:
+
+	overall is dict of both query set + cited by papers as
+	keys. For each key, the values are the list of citations.
+	Our goal is to find the edges between cited by papers and 
+	query set's citations
+
+	cited_by_doi are the list of doi that cite the papers
+	in query set
+	"""
+	overall_copy = overall.copy()
+	all_possible_papers = set(overall.keys())
+	citations = set()
+
+	for key in overall.keys():
+		all_possible_papers.update(overall[key])
+		citations.update(overall[key])
+
+	citations.update(cited_by_doi)
+
+	for doi in tqdm(citations):
+		print(doi)
+
+		if acm:
+			papers_doi_cite = acm_meta(doi)
+		else:
+			papers_doi_cite = get_dummy_info(doi)
+			print(papers_doi_cite)
+
+		for paper in papers_doi_cite:
+			if paper in all_possible_papers:
+
+				print("new paper added....")
+
+				if not overall_copy.get(doi, False):
+					overall_copy[doi] = [paper]
+				else:
+					if paper not in overall_copy[doi]:
+						overall_copy.append(paper)
+
+	return overall_copy
 
