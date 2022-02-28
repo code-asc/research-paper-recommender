@@ -13,13 +13,14 @@ class CFUH:
 	1) First column represent the user or paper
 	2) Second column represent the attributes or the citations
 	"""
-	def __init__(self, default_path='citation-web/matrix-way/', file_='citation-full-matrix.csv', 
-					file_pair=None, normalize_similarity=True, root_node_indexes=None):
+	def __init__(self, default_path='citation-web/', file_='matrix-way/citation-full-matrix.csv', 
+					file_pair='pair-way/citation-full-pairs.txt', normalize_similarity=True, root_node_indexes=None):
 
 		self.file_ = file_
 		self.file_pair = file_pair
 		self.default_path = default_path
 		self.root_node_indexes = root_node_indexes
+		self.deleted_index = []
 		
 		self.df = pd.read_csv(self.default_path + file_)
 
@@ -49,8 +50,12 @@ class CFUH:
 		print('removing the indexes with no citations....')
 		for index in indexes:
 			if not (1 in self.df.loc[index].values):
+				self.deleted_index.append(index)
 				print('Deleting : ', index)
 				self.df.drop(index, inplace=True)
+
+	def get_deleted_index(self):
+		return self.deleted_index
 
 	def __normalize_rank__(self):
 		print('page rank normalization on dataframe....')
@@ -126,6 +131,7 @@ class CFUH:
 		# Then we find the similarity wrt to each item/citation to all in set U and sum them.
 
 		unknowns = set()
+		print(self.df.index.values)
 		already_known = set(self.df.loc[index][self.df.loc[index][self.column_names] > 0.0].index.values)
 		for item in already_known:
 			unknowns.update(self.__top__(n=k, item=item).index.values)
@@ -133,7 +139,6 @@ class CFUH:
 		unknowns = unknowns - already_known
 		suggestions = pd.DataFrame(np.zeros((len(unknowns))), index = unknowns, columns=['score'])
 
-		print('Computing recommendations for : ' + index)
 		for unknown in tqdm(unknowns):
 			temp = 0
 			for known in already_known:

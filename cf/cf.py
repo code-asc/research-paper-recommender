@@ -19,6 +19,7 @@ class CF:
 		self.df.set_index(self.df[self.index_col], inplace=True)
 		self.df.index = self.df.index.astype(str, copy = False)
 		self.df.drop([self.index_col], axis=1, inplace=True)
+		self.deleted_index = []
 
 		self.similarity_mat = self.__similarity__()
 		self.column_names = self.df.columns

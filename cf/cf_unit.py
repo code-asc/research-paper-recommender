@@ -17,6 +17,7 @@ class CFU:
 	
 		self.file_ = file_
 		self.df = pd.read_csv(default_path + file_)
+		self.deleted_index = []
 
 		self.index_col = self.df.columns[0]
 		self.df.set_index(self.df[self.index_col], inplace=True)

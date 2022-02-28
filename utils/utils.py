@@ -101,24 +101,21 @@ def get_fully_connected_network(overall, cited_by_doi, acm=True):
 	citations.update(cited_by_doi)
 
 	for doi in tqdm(citations):
-		print(doi)
 
 		if acm:
 			papers_doi_cite = acm_meta(doi)
 		else:
 			papers_doi_cite = get_dummy_info(doi)
-			print(papers_doi_cite)
 
-		for paper in papers_doi_cite:
-			if paper in all_possible_papers:
+		if papers_doi_cite:
+			for paper in papers_doi_cite:
+				if paper in all_possible_papers:
 
-				print("new paper added....")
-
-				if not overall_copy.get(doi, False):
-					overall_copy[doi] = [paper]
-				else:
-					if paper not in overall_copy[doi]:
-						overall_copy.append(paper)
+					if not overall_copy.get(doi, False):
+						overall_copy[doi] = [paper]
+					else:
+						if paper not in overall_copy[doi]:
+							overall_copy[doi].append(paper)
 
 	return overall_copy
 

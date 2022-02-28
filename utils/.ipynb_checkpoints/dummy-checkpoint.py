@@ -16,8 +16,6 @@ def dummy_data(dummy_paper=200, size=100):
 	"""
 
 	random_citedby_doi = {}
-	random_citation_doi = {}
-
 	for i in random.sample(range(dummy_paper+200, dummy_paper + 300), size):
 		random_citedby_doi[i] = set()
 
@@ -41,16 +39,12 @@ def dummy_data(dummy_paper=200, size=100):
 		cited_by = random.sample(random_citedby_doi.keys(), int(size/2))
 
 		for citation in citations:
-			temp[citation] = {"Google Scholar": str(citation), "Digital Library": "/doi/"+str(citation)}
-
-			if not random_citation_doi.get(citation, False):
-				random_citedby_doi[citation] = set()
-
-			random_citedby_doi[citation].update([paper])
+			temp[str(citation)] = {"Google Scholar": str(citation), "Digital Library": "/doi/"+str(citation)}
 		
 		for citation_ in cited_by:
+
 			random_citedby_doi[citation_].update([paper])
-			temp_[citation_] = {"Digital Library": "/doi/"+str(citation_), "Others": str(citation_)}
+			temp_[str(citation_)] = {"Digital Library": "/doi/"+str(citation_), "Others": str(citation_)}
 
 		temp_reference = {}
 		temp_reference["references"] = temp
@@ -67,16 +61,6 @@ def dummy_data(dummy_paper=200, size=100):
 		temp_reference["references"] = temp
 		con.execute(insert_statement, (str(key), str(json.dumps(temp_reference))))
 
-	for key in random_citation_doi.keys():
-		temp = {}
-		for doi in random_citation_doi[key]:
-			temp[str(doi)] = {"Others": str(doi), "Digital Library": "/doi/"+str(doi)}
-
-		temp_reference = {}
-		temp_reference["references"] = {}
-		temp_reference["cited_by"] = temp
-		con.execute(insert_statement, (str(key), str(json.dumps(temp_reference))))
-		
 	con.commit()
 	con.close()
 

@@ -33,6 +33,7 @@ class Ranking:
 		self.potential_hub_auth_nodes = set(self.__potential_hub_and_auth__()) - self.root_nodes
 		self.__base__()
 
+		# Store node information for each paper
 		self.data = self.__create__()
 
 		self.auth_score = self.__assign_score__()

@@ -21,6 +21,7 @@ class CFUPR:
 		self.file_pair = file_pair
 		self.default_path = default_path
 		self.biased = biased
+		self.deleted_index = []
 		
 		self.df = pd.read_csv(self.default_path + file_)
 
@@ -51,6 +52,7 @@ class CFUPR:
 		for index in indexes:
 			if not (1 in self.df.loc[index].values):
 				print('Deleting : ', index)
+				self.deleted_index.append(index)
 				self.df.drop(index, inplace=True)
 
 	def __normalize_rank__(self):

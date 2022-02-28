@@ -101,10 +101,20 @@ class Train_Test_Split_Plain:
 		else:
 			obj = self.recommender(default_path='temp/matrix-way/', file_='temp-citation-matrix.csv')
 
-		for test in test_set:
-			suggestions, _ = obj.recommend(test)
+		if self.recommender.__name__ == 'CFUH':
+			deleted_index = obj.get_deleted_index()
+			for test in test_set:
+				if test not in deleted_index:
+					test = str(test)
+					suggestions, _ = obj.recommend(test)
 
-			recommendations[test] = suggestions
+					recommendations[test] = suggestions
+		else:
+			for test in test_set:
+				test = str(test)
+				suggestions, _ = obj.recommend(test)
+
+				recommendations[test] = suggestions
 
 		return recommendations
 
@@ -179,7 +189,7 @@ class Train_Test_Split_Plain:
 		return self.__evaluate__(doi_dict, suggestions)
 
 
-	def fit(self, doi_dict_original, doi_dict_):
-		#TODO
-		# Also handle 404 error
-		None
+	# def fit(self, doi_dict_original, doi_dict_):
+	# 	#TODO
+	# 	# Also handle 404 error
+	# 	None
