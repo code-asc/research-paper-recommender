@@ -26,6 +26,8 @@ def acm_meta(doi):
 
 	data['references'] = refs
 
+	data['abstract'] = parser.find('div', {'class': 'abstractSection'}).p.text
+
 	# Code for citations
 	cited_by = requests.get('https://dl.acm.org/action/ajaxShowCitedBy?doi=' + doi).text
 	c_parser = BeautifulSoup(cited_by, features='html.parser')
