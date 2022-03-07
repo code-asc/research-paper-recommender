@@ -189,6 +189,26 @@ class Train_Test_Split_Plain:
 		return self.__evaluate__(doi_dict, suggestions)
 
 
+	def fit_cf(self, doi_dict_):
+		doi_dict = doi_dict_.copy()
+		doi_less_than_limit = {}
+		dois = []
+		doi_keys = list(doi_dict.keys())
+		for doi in doi_keys:
+			if len(doi_dict[doi]) < self.min_ref_limit:
+				doi_less_than_limit[doi] = len(doi_dict[doi])
+				doi_dict.pop(doi, None)
+			else:
+				dois.append(doi)
+
+		print("The following doi's are ignored because of low reference :")
+		pprint(doi_less_than_limit)
+		held_out, renewed_data = self.__pickout__(doi_dict, test_set)
+		
+
+		train_set, test_set = self.__split__(dois)
+
+
 	# def fit(self, doi_dict_original, doi_dict_):
 	# 	#TODO
 	# 	# Also handle 404 error

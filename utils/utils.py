@@ -1,5 +1,5 @@
 from utils.dummy import get_dummy_info
-from acm_api.acm import acm_meta
+import acm_api.acm as acm
 from tqdm.notebook import tqdm
 import requests
 import json
@@ -103,7 +103,7 @@ def get_fully_connected_network(overall, cited_by_doi, acm=True):
 	for doi in tqdm(citations):
 
 		if acm:
-			papers_doi_cite = acm_meta(doi)
+			papers_doi_cite = acm.acm_meta(doi)
 		else:
 			papers_doi_cite = get_dummy_info(doi)
 
