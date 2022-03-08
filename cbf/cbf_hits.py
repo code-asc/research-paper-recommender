@@ -49,8 +49,8 @@ class CBFH:
 		data is the collect of all references for each doi
 		data_citedby is the collection of all the dois that site the paper
 		"""
-		data = None
-		data_citedby = None
+		data = {}
+		data_citedby = {}
 
 		for doi in dois:
 			temp = self.__searchDB__(doi)
@@ -90,7 +90,7 @@ class CBFH:
 					df.loc[i][j] = 1
 
 		overall_ = {**data_citedby, **data}
-		overall = get_fully_connected_network(overall_, data_citedby.keys(), acm=False)
+		overall = utils.get_fully_connected_network(overall_, data_citedby.keys(), acm=False)
 		for i in index_with_citedby:
 			for j in citation_set_with_cited_by:
 				if j in overall[i]:
@@ -112,7 +112,7 @@ class CBFH:
 		data, data_citedby = self.__doi__(union_dois)
 		self.__rmatrix__(data, data_citedby)
 		obj = CFUH(default_path=self.path, file_=self.full_matrix_file_name, \
-				file_pair=self.pair_file_name)
+				file_pair=self.pair_file_name, root_node_indexes=union_dois)
 
 		temp = {}
 		for doi in union_dois:
